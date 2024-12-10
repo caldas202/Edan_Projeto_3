@@ -1,0 +1,34 @@
+// VerilogA for edan, microled_boa, veriloga
+
+`include "constants.vams"
+`include "disciplines.vams"
+
+module microled_boa(anode,cathode);
+	input anode;
+	output cathode;
+	electrical anode,cathode;
+
+	parameter real Is=5e-16;	
+	parameter real Vt = 1.3136;
+	parameter real n = 1.5;
+	parameter real Ut = 0.026;
+	parameter real Vmax= 2.192;
+	parameter real m=7.6923e-5;
+	parameter real b = -0.0001656;
+
+
+	analog begin
+		/*if(V(anode, cathode) < Vmax) begin
+			I(anode, cathode) <+ Is * (exp((V(anode, cathode)-Vt) / (n*Ut)) - 1);
+		end else begin
+			I(anode, cathode) <+ (m*V(anode, cathode))+b;
+		end*/
+		if(V(anode, cathode) < Vt) begin
+			I(anode, cathode) <+ 0;
+		end else if(V(anode, cathode) >= Vt && V(anode, cathode) < Vmax )  begin
+			I(anode, cathode) <+ Is * (exp((V(anode, cathode)-Vt) / (n*Ut)) - 1);
+		end else begin
+			I(anode, cathode) <+ (m*V(anode, cathode))+b;
+		end
+	end
+endmodule

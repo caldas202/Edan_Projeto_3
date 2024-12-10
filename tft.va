@@ -1,0 +1,41 @@
+// VerilogA for edan, tft, veriloga
+
+`include "constants.vams"
+`include "disciplines.vams"
+
+module tft3(drain, gate,source);
+	input gate, drain,source;
+	electrical drain, gate,source;
+
+	parameter real Vto = 0.322;
+	parameter real mo = 1.9133;
+	parameter real lanbda = 0.02076;
+	parameter real a=1;
+	parameter real Ko = 9.095e-6;
+	parameter real w_l = 22;
+
+	parameter real c4 = 0.00042621;
+	parameter real c3 = -0.00385802;
+	parameter real c2 = 0.0137971;
+	parameter real c1 = -0.0154373;
+	parameter real c0 = 0.0135855;
+
+	real VGS;
+	real VDS;
+	real Id;
+	real b;
+	real lambda_poly;
+	analog begin
+	lambda_poly = c4*VGS**4 + c3*VGS**3 + c2*VGS**2 + c1*VGS + c0;
+		b= Ko/10;
+		VGS = V(gate,source);
+		VDS = V(drain,source);
+
+		if(VDS < a*(VGS - Vto)) begin
+			Id = 2*((b*w_l)/a)*((VGS - Vto)**(mo-2))*(VGS-Vto-(VDS/(2*a)))*VDS*(1+(lambda_poly*VDS)) ;
+		end else begin
+			Id = (b*w_l)*((VGS - Vto)**(mo))*(1+(lambda_poly*VDS));
+		end		
+		I(drain,source) <+Id;
+	end
+endmodule
